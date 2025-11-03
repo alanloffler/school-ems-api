@@ -12,6 +12,7 @@ export class AdminService {
   constructor(@InjectRepository(Admin) private adminRepository: Repository<Admin>) {}
 
   async create(createAdminDto: CreateAdminDto): Promise<ApiResponse<Admin>> {
+    // TODO: check if admin already exists
     const createAdmin = this.adminRepository.create(createAdminDto);
     const saveAdmin = await this.adminRepository.save(createAdmin);
     if (!saveAdmin) throw new HttpException("Error al crear admin", HttpStatus.BAD_REQUEST);
@@ -34,7 +35,7 @@ export class AdminService {
   }
 
   async update(id: string, updateAdminDto: UpdateAdminDto): Promise<ApiResponse<Admin>> {
-    const adminToUpdate = await this.findAdminById(id);
+    const adminToUpdate = await this.findOneById(id);
 
     const merged = this.adminRepository.merge(adminToUpdate, updateAdminDto);
     const result = await this.adminRepository.save(merged);
@@ -44,7 +45,7 @@ export class AdminService {
   }
 
   async remove(id: string): Promise<ApiResponse<Admin>> {
-    const adminToRemove = await this.findAdminById(id);
+    const adminToRemove = await this.findOneById(id);
 
     const result = await this.adminRepository.remove(adminToRemove);
     if (!result) throw new HttpException("Error al eliminar admin", HttpStatus.BAD_REQUEST);
@@ -52,7 +53,14 @@ export class AdminService {
     return ApiResponse.removed<Admin>("Admin eliminado", result);
   }
 
-  private async findAdminById(id: string): Promise<Admin> {
+  public async findOneByEmail(email: string) {
+    const admin = await this.adminRepository.findOne({ where: { email } });
+    if (!admin) throw new HttpException("Admin no encontrado", HttpStatus.NOT_FOUND);
+
+    return admin;
+  }
+
+  private async findOneById(id: string): Promise<Admin> {
     const admin = await this.adminRepository.findOne({ where: { id } });
     if (!admin) throw new HttpException("Admin no encontrado", HttpStatus.NOT_FOUND);
 
