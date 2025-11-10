@@ -1,10 +1,11 @@
-import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post } from "@nestjs/common";
+import { Body, Controller, Delete, Get, Param, ParseUUIDPipe, Patch, Post, UseGuards } from "@nestjs/common";
 
 import { AdminService } from "@admin/admin.service";
 import { CreateAdminDto } from "@/admin/dto/create-admin.dto";
-import { UpdateAdminDto } from "@admin/dto/update-admin.dto";
-import { Roles } from "@/common/decorators/roles.decorator";
 import { ERole } from "@/common/enums/role.enum";
+import { JwtAuthGuard } from "@/auth/guards/jwt-auth.guard";
+import { Roles } from "@/common/decorators/roles.decorator";
+import { UpdateAdminDto } from "@admin/dto/update-admin.dto";
 
 @Roles([ERole.Superadmin])
 @Controller("admin")
@@ -16,6 +17,7 @@ export class AdminController {
     return this.adminService.create(admin);
   }
 
+  @UseGuards(JwtAuthGuard)
   @Get()
   findAll() {
     return this.adminService.findAll();
