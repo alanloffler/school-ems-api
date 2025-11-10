@@ -4,8 +4,8 @@ import { ExtractJwt, Strategy } from "passport-jwt";
 import { HttpException, HttpStatus, Injectable } from "@nestjs/common";
 import { PassportStrategy } from "@nestjs/passport";
 
-import type { IPayload } from "@/auth/interfaces/payload.interface";
-import { AdminService } from "@/admin/admin.service";
+import type { IPayload } from "@auth/interfaces/payload.interface";
+import { AdminService } from "@admin/admin.service";
 
 @Injectable()
 export class JwtRefreshStrategy extends PassportStrategy(Strategy, "jwt-refresh") {
@@ -33,7 +33,7 @@ export class JwtRefreshStrategy extends PassportStrategy(Strategy, "jwt-refresh"
     try {
       if (!payload) throw new HttpException("Token invalido", HttpStatus.UNAUTHORIZED);
 
-      const refreshToken = req.cookies.refreshToken;
+      const refreshToken = req.cookies?.refreshToken;
       if (!refreshToken) throw new HttpException("Token de refresco no encontrado", HttpStatus.UNAUTHORIZED);
 
       const admin = await this.adminService.findOne(payload.id);
