@@ -34,9 +34,8 @@ export class JwtStrategy extends PassportStrategy(Strategy) {
 
   async validate(payload: IJwtPayload) {
     const admin = await this.adminService.findOne(payload.sub);
-    console.log("jwt strategy attempt");
     if (!admin) throw new HttpException("Admin no encontrado", HttpStatus.UNAUTHORIZED);
-    console.log("jwt strategy passed");
+
     return {
       id: admin.data?.id,
       email: admin.data?.email,
