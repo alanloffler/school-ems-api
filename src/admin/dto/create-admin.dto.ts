@@ -1,4 +1,4 @@
-import { IsEmail, IsNotEmpty, IsString, IsUUID, Length, MinLength } from "class-validator";
+import { IsEmail, IsNotEmpty, IsOptional, IsString, IsUUID, Length, MinLength } from "class-validator";
 
 export class CreateAdminDto {
   @Length(8, 8, { message: "El DNI debe tener 8 caracteres" })
@@ -35,4 +35,8 @@ export class CreateAdminDto {
   @IsUUID()
   @IsNotEmpty({ message: "El rol es obligatorio" })
   roleId: string;
+
+  @IsString({ message: "El refresh token debe ser una cadena de texto" })
+  @IsOptional()
+  refreshToken?: string;
 }
