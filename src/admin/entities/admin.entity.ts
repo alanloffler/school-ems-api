@@ -42,6 +42,9 @@ export class Admin {
   @JoinColumn({ name: "role_id" })
   role: Role;
 
+  @Column({ type: "text", nullable: true })
+  refreshToken: string;
+
   @CreateDateColumn({ name: "created_at" })
   createdAt: Date;
 
