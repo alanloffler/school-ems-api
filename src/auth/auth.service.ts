@@ -58,13 +58,17 @@ export class AuthService {
   }
 
   async getTokens(payload: IPayload): Promise<IToken> {
+    const sanitizedPayload: IPayload = { ...payload };
+    delete sanitizedPayload.exp;
+    delete sanitizedPayload.iat;
+
     try {
       const [accessToken, refreshToken] = await Promise.all([
-        this.jwtService.signAsync(payload, {
+        this.jwtService.signAsync(sanitizedPayload, {
           secret: this.configService.get<string>("JWT_SECRET"),
           expiresIn: this.configService.get("JWT_EXPIRES_IN"),
         }),
-        this.jwtService.signAsync(payload, {
+        this.jwtService.signAsync(sanitizedPayload, {
           secret: this.configService.get<string>("JWT_REFRESH_SECRET"),
           expiresIn: this.configService.get("JWT_REFRESH_EXPIRES_IN"),
         }),
@@ -88,6 +92,21 @@ export class AuthService {
     this.clearTokenCookie(res);
 
     return ApiResponse.success<null>("Deslogueo exitoso", null);
+  }
+
+  async refreshToken(payload: IPayload, refreshToken: string, res: Response) {
+    const admin = await this.adminService.findOne(payload.id);
+    if (!admin.data || !admin.data?.refreshToken)
+      throw new HttpException("Token de actualización no existe", HttpStatus.BAD_REQUEST);
+    if (admin.data?.refreshToken !== refreshToken)
+      throw new HttpException("Token de actualización inválido", HttpStatus.BAD_REQUEST);
+
+    const tokens = await this.getTokens(payload);
+    await this.updateRefreshToken(admin.data.id, tokens.refreshToken);
+
+    this.setTokenCookie(res, tokens);
+
+    return ApiResponse.success<IToken>("Actualización de token exitoso", tokens);
   }
 
   private setTokenCookie(res: Response, tokens: IToken): void {
