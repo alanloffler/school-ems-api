@@ -52,10 +52,8 @@ Expires times are in minutes for testing purposes. Modify JWT_EXPIRES_IN and JWT
 
 Suggested values:
 
-JWT_EXPIRES_IN=15m
+JWT_EXPIRES_IN=15m  
 JWT_REFRESH_EXPIRES_IN=5d
-
-```
 
 ## Stay in touch
 
@@ -64,4 +62,3 @@ JWT_REFRESH_EXPIRES_IN=5d
 ## License
 
 nest-auth-api is [MIT licensed](https://github.com/nestjs/nest/blob/master/LICENSE).
-```
